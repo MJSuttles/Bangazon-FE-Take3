@@ -15,7 +15,7 @@ const getUsers = (uid) =>
       .catch(reject);
   });
 
-const registerUser = (payload) =>
+const createUser = (payload) =>
   new Promise((resolve, reject) => {
     fetch(`${endpoint}/api/register`, {
       method: 'POST',
@@ -29,4 +29,4 @@ const registerUser = (payload) =>
       .catch(reject);
   });
 
-export { getUsers, registerUser };
+export { getUsers, createUser };

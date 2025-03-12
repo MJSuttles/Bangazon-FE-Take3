@@ -20,7 +20,7 @@ const endpoint = clientCredentials.databaseURL;
 
 const checkUser = (uid) =>
   new Promise((resolve, reject) => {
-    fetch(`${endpoint}/checkuser/${uid}`, {
+    fetch(`${endpoint}/api/checkuser/${uid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -41,17 +41,32 @@ const checkUser = (uid) =>
       .catch(reject);
   });
 
-const registerUser = (userInfo) =>
+// const registerUser = (uid) =>
+//   new Promise((resolve, reject) => {
+//     fetch(`${endpoint}/api/users/new`, {
+//       method: 'POST',
+//       body: JSON.stringify(uid),
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Accept: 'application/json',
+//       },
+//     })
+//       .then((resp) => resolve(resp.json()))
+//       .catch(reject);
+//   });
+
+const registerUser = (uid) =>
   new Promise((resolve, reject) => {
-    fetch(`${endpoint}/users/`, {
+    fetch(`${endpoint}/api/users/new`, {
       method: 'POST',
-      body: JSON.stringify(userInfo),
+      body: JSON.stringify(uid),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
     })
-      .then((resp) => resolve(resp.json()))
+      .then((resp) => resp.json())
+      .then((data) => resolve(data))
       .catch(reject);
   });
 
