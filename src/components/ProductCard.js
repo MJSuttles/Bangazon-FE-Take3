@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Dropdown } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 
@@ -19,54 +19,45 @@ export default function ProductCard({ productObj, onUpdate }) {
       })
       .then(() => {
         console.log('✅ Product added to cart:', productObj.id);
-        onUpdate(); // ✅ Trigger onUpdate to refresh the cart
+        onUpdate(); // ✅ Refresh cart after adding product
       })
       .catch((error) => console.error('Error adding to cart:', error));
   };
 
   return (
-    <div className="row align-items-center border my-3 d-flex container" style={{ width: '70%', height: '7rem' }}>
-      <div className="col">
-        <p>{productObj.name}</p>
-      </div>
-      <div className="col">
-        <p>{productObj.isAvailable ? 'Available' : 'Out of Stock'}</p>
-      </div>
-      <div className="col">
-        <p>${productObj.price}</p>
-      </div>
-      <div className="col">
-        <img src={productObj.image} alt={productObj.name} width="50" />
-      </div>
-      <div className="col">
-        <p>{productObj.description}</p>
-      </div>
-      <div className="col">
-        <p>Qty: {productObj.quantity}</p>
-      </div>
-      <div className="col">
-        <p>Category: {productObj.categoryId}</p>
-      </div>
-      <div className="col">
-        <p>Seller ID: {productObj.sellerId}</p>
-      </div>
-      <div className="col">
-        <Dropdown>
-          <Dropdown.Toggle variant="success" id="dropdown-basic">
-            Options
-          </Dropdown.Toggle>
+    <Card className="product-card my-3 shadow">
+      <Card.Img variant="top" src={productObj.image} alt={productObj.name} className="product-image" />
+      <Card.Body>
+        <Card.Title className="text-center">{productObj.name}</Card.Title>
+        <Card.Text>
+          <strong>Price:</strong> ${productObj.price}
+        </Card.Text>
+        <Card.Text>
+          <strong>Available:</strong> {productObj.isAvailable ? 'Yes' : 'No'}
+        </Card.Text>
+        <Card.Text>
+          <strong>Quantity:</strong> {productObj.quantity}
+        </Card.Text>
+        <Card.Text>
+          <strong>Category:</strong> {productObj.categoryId}
+        </Card.Text>
+        <Card.Text>
+          <strong>Seller ID:</strong> {productObj.sellerId}
+        </Card.Text>
+        <Card.Text className="description">
+          <strong>Description:</strong> {productObj.description}
+        </Card.Text>
 
-          <Dropdown.Menu>
-            <Dropdown.Item>
-              <Link href={`/products/${productObj.id}`} passHref>
-                View Product
-              </Link>
-            </Dropdown.Item>
-            <Dropdown.Item onClick={handleAddToCart}>Add to Cart</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
-    </div>
+        <div className="d-flex justify-content-between">
+          <Link href={`/products/${productObj.id}`} passHref>
+            <Button variant="primary">View</Button>
+          </Link>
+          <Button variant="success" onClick={handleAddToCart}>
+            Add to Cart
+          </Button>
+        </div>
+      </Card.Body>
+    </Card>
   );
 }
 
