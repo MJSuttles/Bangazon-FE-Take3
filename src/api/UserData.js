@@ -17,7 +17,7 @@ const getUser = (uid) =>
 
 const createUser = (payload) =>
   new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/register`, {
+    fetch(`${endpoint}/api/users/new`, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json',
