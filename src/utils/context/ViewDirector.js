@@ -5,24 +5,26 @@ import SignIn from '@/components/SignIn';
 import NavBar from '@/components/NavBar';
 
 function ViewDirectorBasedOnUserAuthStatus({ children }) {
-  const { user, userLoading } = useAuth();
+  const { user, loading } = useAuth();
 
-  // if user state is null, then show loader
-  if (userLoading) {
+  if (loading) {
     return <Loading />;
   }
 
-  // what the user should see if they are logged in
-  if (user) {
-    return (
-      <>
-        <NavBar /> {/* NavBar only visible if user is logged in and is in every view */}
-        {children}
-      </>
-    );
+  if (!user) {
+    return <SignIn />;
   }
 
-  return <SignIn />;
+  // if (!databaseUser || Object.keys(databaseUser).length === 0) {
+  //   return <RegistrationForm user={user} />;
+  // }
+
+  return (
+    <>
+      <NavBar />
+      {children}
+    </>
+  );
 }
 
 export default ViewDirectorBasedOnUserAuthStatus;
