@@ -18,7 +18,7 @@ export default function NavBar() {
 
             {/* Homepage is product page */}
             <Link className="nav-link" href="/">
-              Home
+              Products
             </Link>
             <Link className="nav-link" href="/user-profile/uid">
               User Profile
