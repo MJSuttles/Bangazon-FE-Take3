@@ -2,16 +2,16 @@ import { clientCredentials } from '../utils/client';
 
 const endpoint = clientCredentials.databaseURL;
 
-const getUsers = (uid) =>
+const getUser = (uid) =>
   new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/users/${uid}"`, {
+    fetch(`${endpoint}/api/users/${uid}`, {
       method: 'GET',
       headers: {
         'Content-type': 'application/json',
       },
     })
       .then((response) => response.json())
-      .then((data) => resolve(Object.values(data)))
+      .then((data) => resolve(data))
       .catch(reject);
   });
 
@@ -29,4 +29,4 @@ const createUser = (payload) =>
       .catch(reject);
   });
 
-export { getUsers, createUser };
+export { getUser, createUser };
