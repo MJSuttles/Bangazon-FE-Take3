@@ -3,28 +3,44 @@ import { useAuth } from '@/utils/context/authContext';
 import Loading from '@/components/Loading';
 import SignIn from '@/components/SignIn';
 import NavBar from '@/components/NavBar';
+import { useEffect, useState } from 'react';
+import RegistrationForm from '../../components/forms/RegistrationForm';
+import { checkUser } from '../auth';
 
 function ViewDirectorBasedOnUserAuthStatus({ children }) {
-  const { user, loading } = useAuth();
+  const [databaseUser, setDatabaseUser] = useState({});
 
-  if (loading) {
+  const { user, userLoading, updateUser } = useAuth();
+
+  useEffect(() => {
+    if (user && user.uid) {
+      checkUser(user.uid).then(setDatabaseUser);
+    }
+  }, [user]);
+
+  // if user state is null, then show loader
+  if (userLoading) {
     return <Loading />;
   }
 
-  if (!user) {
-    return <SignIn />;
+  // Check if user is logged in
+  if (user) {
+    // Check if the user has registered
+    if (user.uid !== databaseUser.uid) {
+      // Show RegisterForm if user has not registered
+      return <RegistrationForm user={user} updateUser={updateUser} />;
+    }
+    // If user has registered, show the home page or main content
+    return (
+      <>
+        <NavBar />
+        {children} {/* Render children for home page or main content */}
+      </>
+    );
   }
 
-  // if (!databaseUser || Object.keys(databaseUser).length === 0) {
-  //   return <RegistrationForm user={user} />;
-  // }
-
-  return (
-    <>
-      <NavBar />
-      {children}
-    </>
-  );
+  // Show SignIn if user is not logged in
+  return <SignIn />;
 }
 
 export default ViewDirectorBasedOnUserAuthStatus;

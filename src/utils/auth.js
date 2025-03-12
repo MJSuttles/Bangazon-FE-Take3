@@ -4,56 +4,46 @@ import { clientCredentials } from './client';
 
 const endpoint = clientCredentials.databaseURL;
 
-const checkUser = (uid) =>
-  new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/checkuser/${uid}`, {
+const checkUser = async (uid) => {
+  try {
+    const response = await fetch(`${endpoint}/checkuser/${uid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-    })
-      .then(async (res) => {
-        let data;
-        console.log('status:', res);
-        if (res.status === 204) {
-          resolve({});
-        } else {
-          data = await res.json();
-          // console.log('data:', data);
-          resolve(data);
-        }
-      })
-      .catch(reject);
-  });
+    });
 
-// const registerUser = (uid) =>
-//   new Promise((resolve, reject) => {
-//     fetch(`${endpoint}/api/users/new`, {
-//       method: 'POST',
-//       body: JSON.stringify(uid),
-//       headers: {
-//         'Content-Type': 'application/json',
-//         Accept: 'application/json',
-//       },
-//     })
-//       .then((resp) => resolve(resp.json()))
-//       .catch(reject);
-//   });
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {}; // ✅ Return empty object instead of null
+      }
+      throw new Error(`API Error: ${response.statusText}`);
+    }
 
-const registerUser = (uid) =>
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking user:', error);
+    return {}; // ✅ Ensure a valid return type
+  }
+};
+
+const registerUser = (userInfo) =>
   new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/users/new`, {
+    console.log('API Endpoint:', endpoint); // ✅ Debugging line
+    fetch(`${endpoint}/users`, {
       method: 'POST',
-      body: JSON.stringify(uid),
+      body: JSON.stringify(userInfo),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
     })
-      .then((resp) => resp.json())
-      .then((data) => resolve(data))
-      .catch(reject);
+      .then((resp) => resolve(resp.json()))
+      .catch((error) => {
+        console.error('Error registering user:', error); // ✅ Log the error
+        reject(error);
+      });
   });
 
 const signIn = () => {
