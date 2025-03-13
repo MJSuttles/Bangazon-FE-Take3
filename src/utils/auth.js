@@ -1,59 +1,113 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import { clientCredentials } from './client';
+// import firebase from 'firebase/app';
+// import 'firebase/auth';
+// import { clientCredentials } from './client';
 
-const endpoint = clientCredentials.databaseURL;
+// const endpoint = clientCredentials.databaseURL;
 
-const checkUser = (uid) =>
-  new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/checkuser/${uid}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    })
-      .then(async (res) => {
-        let data;
-        console.log('status:', res);
-        if (res.status === 204) {
-          resolve({});
-        } else {
-          data = await res.json();
-          // console.log('data:', data);
-          resolve(data);
-        }
-      })
-      .catch(reject);
-  });
+// const checkUser = async (uid) => {
+//   try {
+//     const response = await fetch(`${endpoint}/api/checkuser/${uid}`, {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Accept: 'application/json',
+//       },
+//     });
 
-// const registerUser = (uid) =>
+//     if (!response.ok) {
+//       if (response.status === 404) {
+//         return {}; // ✅ Return empty object instead of null
+//       }
+//       throw new Error(`API Error: ${response.statusText}`);
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     console.error('Error checking user:', error);
+//     return {}; // ✅ Ensure a valid return type
+//   }
+// };
+
+// const registerUser = (userInfo) =>
 //   new Promise((resolve, reject) => {
-//     fetch(`${endpoint}/api/users/new`, {
+//     console.log('API Endpoint:', endpoint); // ✅ Debugging line
+//     fetch(`${endpoint}/api/users`, {
 //       method: 'POST',
-//       body: JSON.stringify(uid),
+//       body: JSON.stringify(userInfo),
 //       headers: {
 //         'Content-Type': 'application/json',
 //         Accept: 'application/json',
 //       },
 //     })
 //       .then((resp) => resolve(resp.json()))
-//       .catch(reject);
+//       .catch((error) => {
+//         console.error('Error registering user:', error); // ✅ Log the error
+//         reject(error);
+//       });
 //   });
 
-const registerUser = (uid) =>
+// const signIn = () => {
+//   const provider = new firebase.auth.GoogleAuthProvider();
+//   firebase.auth().signInWithPopup(provider);
+// };
+
+// const signOut = () => {
+//   firebase.auth().signOut();
+// };
+
+// export {
+//   signIn, //
+//   signOut,
+//   checkUser,
+//   registerUser,
+// };
+
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import { clientCredentials } from './client';
+
+const endpoint = clientCredentials.databaseURL;
+
+const checkUser = async (uid) => {
+  try {
+    const response = await fetch(`${endpoint}/api/checkuser/${uid}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {}; // ✅ Return empty object instead of null
+      }
+      throw new Error(`API Error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error checking user:', error);
+    return {}; // ✅ Ensure a valid return type
+  }
+};
+
+const registerUser = (userInfo) =>
   new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/users/new`, {
+    console.log('API Endpoint:', endpoint); // ✅ Debugging line
+    fetch(`${endpoint}/api/users`, {
       method: 'POST',
-      body: JSON.stringify(uid),
+      body: JSON.stringify(userInfo),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
     })
-      .then((resp) => resp.json())
-      .then((data) => resolve(data))
-      .catch(reject);
+      .then((resp) => resolve(resp.json()))
+      .catch((error) => {
+        console.error('Error registering user:', error); // ✅ Log the error
+        reject(error);
+      });
   });
 
 const signIn = () => {

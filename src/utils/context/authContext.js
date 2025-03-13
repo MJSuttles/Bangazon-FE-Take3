@@ -1,45 +1,125 @@
-'use client';
+// import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+// import { checkUser } from '../auth';
+// import { firebase } from '../client';
+
+// const AuthContext = createContext();
+// AuthContext.displayName = 'AuthContext';
+
+// function AuthProvider(props) {
+//   const [user, setUser] = useState(null);
+//   const [oAuthUser, setOAuthUser] = useState(null);
+
+//   // ✅ Properly handles updating user data
+//   const updateUser = async (uid) => {
+//     try {
+//       const gamerInfo = await checkUser(uid);
+//       setUser({ fbUser: oAuthUser, ...gamerInfo });
+//     } catch (error) {
+//       console.error('Error updating user:', error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     // ✅ Firebase Auth Listener (with cleanup)
+//     const unsubscribe = firebase.auth().onAuthStateChanged(async (fbUser) => {
+//       if (fbUser) {
+//         setOAuthUser(fbUser);
+//         try {
+//           const gamerInfo = await checkUser(fbUser.uid);
+//           setUser(gamerInfo ? { fbUser, uid: fbUser.uid, ...gamerInfo } : { fbUser, uid: fbUser.uid });
+//         } catch (error) {
+//           console.error('Error checking user:', error);
+//           setUser({ fbUser, uid: fbUser.uid });
+//         }
+//       } else {
+//         setOAuthUser(false);
+//         setUser(false);
+//       }
+//     });
+
+//     return () => unsubscribe(); // ✅ Cleanup function for the listener
+//   }, []);
+
+//   const value = useMemo(
+//     () => ({
+//       user,
+//       updateUser,
+//       userLoading: user === null || oAuthUser === null,
+//     }),
+//     [user, oAuthUser],
+//   );
+
+//   return <AuthContext.Provider value={value} {...props} />;
+// }
+
+// const AuthConsumer = AuthContext.Consumer;
+
+// const useAuth = () => {
+//   const context = useContext(AuthContext);
+//   if (context === undefined) {
+//     throw new Error('useAuth must be used within an AuthProvider');
+//   }
+//   return context;
+// };
+
+// export { AuthProvider, useAuth, AuthConsumer };
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { firebase , clientCredentials } from '@/utils/client';
-import { useRouter } from 'next/navigation';
-
-const endpoint = clientCredentials.databaseURL;
+import { checkUser } from '../auth';
+import { firebase } from '../client';
 
 const AuthContext = createContext();
 AuthContext.displayName = 'AuthContext';
 
 function AuthProvider(props) {
   const [user, setUser] = useState(null);
-  const router = useRouter(); // :white_check_mark: Import Next.js router for redirection
+  const [oAuthUser, setOAuthUser] = useState(null);
+
+  // ✅ Properly handles updating user data
+  const updateUser = async (uid) => {
+    try {
+      const gamerInfo = await checkUser(uid);
+      setUser({ fbUser: oAuthUser, ...gamerInfo });
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
   useEffect(() => {
+    // ✅ Firebase Auth Listener (with cleanup)
     const unsubscribe = firebase.auth().onAuthStateChanged(async (fbUser) => {
       if (fbUser) {
-        setUser(fbUser);
-        // Check if user exists in backend
-        const response = await fetch(`${endpoint}/api/users/${fbUser.uid}`);
-        if (response.status === 404) {
-          console.log('User not found, redirecting to /register');
-          router.push('/register'); // :white_check_mark: Redirect new users to register
-        } else {
-          console.log('User exists, redirecting to home page');
-          router.push('/'); // :white_check_mark: Redirect existing users to home
+        setOAuthUser(fbUser);
+        try {
+          const gamerInfo = await checkUser(fbUser.uid);
+          setUser(gamerInfo ? { fbUser, uid: fbUser.uid, ...gamerInfo } : { fbUser, uid: fbUser.uid });
+        } catch (error) {
+          console.error('Error checking user:', error);
+          setUser({ fbUser, uid: fbUser.uid });
         }
       } else {
+        setOAuthUser(false);
         setUser(false);
       }
     });
-    return () => unsubscribe(); // Cleanup function
-  }, [router]);
+
+    return () => unsubscribe(); // ✅ Cleanup function for the listener
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
-      userLoading: user === null,
+      updateUser,
+      userLoading: user === null || oAuthUser === null,
     }),
-    [user],
+    [user, oAuthUser],
   );
+
   return <AuthContext.Provider value={value} {...props} />;
 }
+
+const AuthConsumer = AuthContext.Consumer;
+
 const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -47,4 +127,5 @@ const useAuth = () => {
   }
   return context;
 };
-export { AuthProvider, useAuth };
+
+export { AuthProvider, useAuth, AuthConsumer };

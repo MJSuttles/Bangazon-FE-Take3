@@ -1,190 +1,113 @@
-// 'use client';
-
-// import PropTypes from 'prop-types';
-// import React, { useState } from 'react';
-// import Button from 'react-bootstrap/Button';
-// import Form from 'react-bootstrap/Form';
-// import Container from 'react-bootstrap/Container';
-// import Row from 'react-bootstrap/Row';
-// import Col from 'react-bootstrap/Col';
-// import { useRouter } from 'next/router';
-// import { useAuth } from '../../utils/context/authContext';
-// import { registerUser } from '../../utils/auth';
-
-// // Step one - Set initialFormState as the default parameter.  Grb the useAuth hook.  Set a useState inside RegistrationForm.  Initialize router object.
-// const initialFormState = {
-//   firstName: '',
-//   lastName: '',
-//   email: '',
-//   address: '',
-//   city: '',
-//   state: '',
-//   zip: '',
-// };
-
-// export default function RegistrationForm({ obj = initialFormState }) {
-//   const { user, updateUser } = useAuth();
-//   const router = useRouter();
-
-//   const [formData, setFormData] = useState(obj);
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     registerUser(formData).then(() => updateUser(user.uid));
-//     router.push('/');
-//   };
-
-//   return (
-//     <Container fluid className="d-flex vh-100 justify-content-center align-items-center">
-//       <Row className="w-100 justify-content-center">
-//         <Col xs={12} md={6} lg={4} className="fixed-width">
-//           <Form onSubmit={handleSubmit} style={{ color: 'white' }}>
-//             <Form.Group className="mb-3" controlId="formBasicFirstName">
-//               <Form.Label>First Name</Form.Label>
-//               <Form.Control type="text" name="firstName" required placeholder="Enter Your First Name" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Form.Group className="mb-3" controlId="formBasicLastName">
-//               <Form.Label>Last Name</Form.Label>
-//               <Form.Control type="text" name="lastName" required placeholder="Enter Your Last Name" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Form.Group className="mb-3" controlId="formBasicEmail">
-//               <Form.Label>Email</Form.Label>
-//               <Form.Control type="email" name="email" required placeholder="Enter Your Email" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Form.Group className="mb-3" controlId="formBasicAddress">
-//               <Form.Label>Street Address</Form.Label>
-//               <Form.Control type="text" name="address" required placeholder="Enter Your Street Address" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Form.Group className="mb-3" controlId="formBasicCity">
-//               <Form.Label>City</Form.Label>
-//               <Form.Control type="text" name="city" required placeholder="Enter Your City" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Form.Group className="mb-3" controlId="formBasicState">
-//               <Form.Label>State</Form.Label>
-//               <Form.Control type="text" name="State" required placeholder="Enter Your State" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Form.Group className="mb-3" controlId="formBasicZipCode">
-//               <Form.Label>Zip Code</Form.Label>
-//               <Form.Control type="text" name="Zip code" required placeholder="Enter Your Zip Code" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-//             </Form.Group>
-//             <Button type="submit" size="lg" className="copy-btn" variant="outline-warning">
-//               Submit
-//             </Button>
-//           </Form>
-//         </Col>
-//       </Row>
-//     </Container>
-//   );
-// }
-
-// RegistrationForm.propTypes = {
-//   obj: PropTypes.shape({
-//     uid: PropTypes.string.isRequired,
-//     firstName: PropTypes.string.isRequired,
-//     email: PropTypes.string.isRequired,
-//     address: PropTypes.string.isRequired,
-//     city: PropTypes.string.isRequired,
-//     state: PropTypes.string.isRequired,
-//     zip: PropTypes.string.isRequired,
-//   }).isRequired,
-// };
-
 'use client';
 
- // ✅ Ensures this runs only on the client
-
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import PropTypes from 'prop-types';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../utils/context/authContext';
 import { registerUser } from '../../utils/auth';
 
-const initialFormState = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  address: '',
-  city: '',
-  state: '',
-  zip: '',
-};
-
-export default function RegistrationForm({ obj = initialFormState }) {
+function RegistrationForm() {
   const { user, updateUser } = useAuth();
-  const [formData, setFormData] = useState(obj);
-  const [mounted, setMounted] = useState(false); // ✅ Prevents SSR errors
   const router = useRouter();
 
-  useEffect(() => {
-    setMounted(true); // ✅ Ensures the component only runs on the client
-  }, []);
+  const [formData, setFormData] = useState({
+    uid: user?.uid || '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     registerUser(formData).then(() => {
-      updateUser(user.uid);
-      router.push('/'); // ✅ Ensure `router` is used only on the client
+      updateUser(user?.uid);
+      router.push('/');
     });
   };
 
-  if (!mounted) return null; // ✅ Prevents "NextRouter not mounted" errors
-
   return (
-    <Container fluid className="d-flex vh-100 justify-content-center align-items-center">
-      <Row className="w-100 justify-content-center">
-        <Col xs={12} md={6} lg={4} className="fixed-width">
-          <Form onSubmit={handleSubmit} style={{ color: 'white' }}>
-            <Form.Group className="mb-3" controlId="formBasicFirstName">
-              <Form.Label>First Name</Form.Label>
-              <Form.Control type="text" name="firstName" required placeholder="Enter Your First Name" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicLastName">
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control type="text" name="lastName" required placeholder="Enter Your Last Name" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" name="email" required placeholder="Enter Your Email" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicAddress">
-              <Form.Label>Street Address</Form.Label>
-              <Form.Control type="text" name="address" required placeholder="Enter Your Street Address" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicCity">
-              <Form.Label>City</Form.Label>
-              <Form.Control type="text" name="city" required placeholder="Enter Your City" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicState">
-              <Form.Label>State</Form.Label>
-              <Form.Control type="text" name="state" required placeholder="Enter Your State" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicZipCode">
-              <Form.Label>Zip Code</Form.Label>
-              <Form.Control type="text" name="zip" required placeholder="Enter Your Zip Code" onChange={({ target }) => setFormData((prev) => ({ ...prev, [target.name]: target.value }))} />
-            </Form.Group>
-            <Button type="submit" size="lg" className="copy-btn" variant="outline-warning">
-              Submit
-            </Button>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100vh', backgroundColor: '#f9f9f9', color: 'black' }}>
+      <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Register</h2>
+      <form style={{ background: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', width: '400px' }} onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="firstName">
+            First Name
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="firstName" name="firstName" required value={formData.firstName} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="lastName">
+            Last Name
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="lastName" name="lastName" required value={formData.lastName} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="email">
+            Email
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="email" id="email" name="email" required value={formData.email} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="password">
+            Password
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="password" name="password" required value={formData.password} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="address">
+            Address
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="address" name="address" required value={formData.address} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="city">
+            City
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="city" name="city" required value={formData.city} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="state">
+            State
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="state" name="state" required value={formData.state} onChange={handleChange} />
+        </div>
+
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }} htmlFor="zip">
+            Zip Code
+          </label>
+          <input style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '5px' }} type="text" id="zip" name="zip" required value={formData.zip} onChange={handleChange} />
+        </div>
+
+        <button style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }} type="submit">
+          Submit
+        </button>
+      </form>
+    </div>
   );
 }
 
 RegistrationForm.propTypes = {
-  obj: PropTypes.shape({
-    firstName: PropTypes.string.isRequired,
-    lastName: PropTypes.string.isRequired,
-    email: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
-    city: PropTypes.string.isRequired,
-    state: PropTypes.string.isRequired,
-    zip: PropTypes.string.isRequired,
-  }).isRequired,
+  user: PropTypes.shape({
+    uid: PropTypes.string,
+    email: PropTypes.string,
+  }),
 };
+
+export default RegistrationForm;
