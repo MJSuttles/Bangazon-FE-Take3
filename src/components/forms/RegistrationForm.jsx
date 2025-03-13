@@ -11,7 +11,7 @@ function RegistrationForm() {
   const router = useRouter();
 
   const [formData, setFormData] = useState({
-    uid: user?.uid || '',
+    uid: user.fbUser.uid,
     firstName: '',
     lastName: '',
     email: '',
@@ -29,10 +29,8 @@ function RegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    registerUser(formData).then(() => {
-      updateUser(user?.uid);
-      router.push('/');
-    });
+    registerUser(formData).then(() => updateUser(user.fbUser.uid));
+    router.push('/');
   };
 
   return (
