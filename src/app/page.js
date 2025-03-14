@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getAllProducts } from '../api/OrderData';
+import { getAllProducts } from '../api/ProductData';
 import ProductCard from '../components/ProductCard'; // ✅ Ensure ProductCard is imported
 
 function Home() {
