@@ -5,32 +5,28 @@ import { useRouter } from 'next/navigation'; // ✅ Import useRouter
 import { Card, Button } from 'react-bootstrap';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
+import { useAuth } from '../utils/context/authContext';
 
-export default function ProductCard({ productObj, onUpdate }) {
+export default function ProductCard({ productObj }) {
   const router = useRouter(); // ✅ Use Next.js router for navigation
+  const { user } = useAuth();
 
-  // ✅ Function to handle adding to cart
   const handleAddToCart = async () => {
     try {
-      const response = await fetch(`http://localhost:5215/api/cart/add`, {
+      const response = await fetch('http://localhost:5215/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: localStorage.getItem('userId'), // ✅ Ensure the userId is available
+          userId: user.uid, // ✅ Dynamic user ID
           productId: productObj.id,
           quantity: 1,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to add to cart');
-      }
+      if (!response.ok) throw new Error('Failed to add to cart');
 
-      await response.json();
       console.log('✅ Product added to cart:', productObj.id);
-
-      onUpdate(); // ✅ Refresh cart after adding product
-      router.push('/cart'); // ✅ Redirect to Cart page
+      router.push(`/cart/${user.uid}`); // ✅ Route dynamically to the cart page
     } catch (error) {
       console.error('Error adding to cart:', error);
     }
@@ -85,5 +81,4 @@ ProductCard.propTypes = {
     categoryId: PropTypes.number.isRequired,
     sellerId: PropTypes.string.isRequired,
   }).isRequired,
-  onUpdate: PropTypes.func.isRequired,
 };
