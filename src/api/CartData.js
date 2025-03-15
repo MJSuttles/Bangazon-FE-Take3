@@ -8,18 +8,29 @@ const getCart = async (userId) => {
   return response.json();
 };
 
-const addPaymentToCart = (payload) =>
-  new Promise((resolve, reject) => {
-    fetch(`${endpoint}/api/cart/add-payment`, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    })
-      .then((response) => response.json())
-      .then((data) => resolve(data))
-      .catch(reject);
+const addPaymentToCart = async (userId, paymentMethodId) => {
+  const payload = {
+    userId,
+    paymentMethodId: parseInt(paymentMethodId, 10), // ✅ Convert again to ensure correct type
+  };
+
+  console.log('📤 API Call - Sending Payload:', JSON.stringify(payload, null, 2));
+
+  const response = await fetch(`${endpoint}/api/cart/add-payment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
   });
+
+  console.log('📥 API Response Status:', response.status);
+
+  if (!response.ok) {
+    const errorText = await response.text(); // ✅ Get error response
+    console.error('❌ API Error Response:', errorText);
+    throw new Error(`Failed to add payment method: ${errorText}`);
+  }
+
+  return response.json();
+};
 
 export { getCart, addPaymentToCart };
