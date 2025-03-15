@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { getProductDetails } from '../../../api/OrderData';
+import Image from 'next/image';
+import { getProductDetails } from '../../../api/ProductData';
 
 export default function ProductDetails() {
   const [singleProduct, setSingleProduct] = useState(null);
@@ -33,7 +34,13 @@ export default function ProductDetails() {
         </p>
         <p>
           <strong>Image:</strong> <br />
-          <img src={singleProduct.image} alt={singleProduct.name} width="200" />
+          <Image
+            src={singleProduct.image}
+            alt={singleProduct.name}
+            width={200}
+            height={200} // ✅ Required for Next.js Image
+            layout="intrinsic" // ✅ Ensures correct scaling
+          />
         </p>
         <p>
           Description: <strong>{singleProduct.description}</strong>

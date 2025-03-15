@@ -24,8 +24,6 @@ export default function ProductCard({ productObj }) {
       });
 
       if (!response.ok) throw new Error('Failed to add to cart');
-
-      console.log('✅ Product added to cart:', productObj.id);
       router.push(`/cart/${user.uid}`); // ✅ Route dynamically to the cart page
     } catch (error) {
       console.error('Error adding to cart:', error);
